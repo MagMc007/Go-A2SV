@@ -1,4 +1,4 @@
-package main
+package models
 
 type Book struct {
 	ID int
