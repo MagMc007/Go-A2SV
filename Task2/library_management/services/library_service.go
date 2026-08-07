@@ -27,7 +27,7 @@ type Library struct {
 func NewLibrary() *Library {
 	return &Library{
 		bookMap: make(map[int]models.Book),
-		memberMap: make(map[int]models.member),
+		memberMap: make(map[int]models.Member),
 	}
 }
 
