@@ -1,15 +1,17 @@
 package services
 import (
-	"library_management/models"
 	"errors"
+
+	"library_management/models"
 )
+
 
 type LibraryManager interface {
 	AddBook(book models.Book)
 	RemoveBook(bookID int)
 
-	BorrowBook(bookID int, memberID int) errors
-	ReturnBook(bookID int, memberID int) errors
+	BorrowBook(bookID int, memberID int) error
+	ReturnBook(bookID int, memberID int) error
 
 	ListAvailableBooks() []models.Book
 	ListBorrowedBooks(memberID int) []models.Book
@@ -18,8 +20,15 @@ type LibraryManager interface {
 
 // declare the struct
 type Library struct {
-	bookMap map[int]models.Book{}
-	memberMap map[int]models.Member{}
+	bookMap map[int]models.Book
+	memberMap map[int]models.Member
+}
+
+func NewLibrary() *Library {
+	return &Library{
+		bookMap: make(map[int]models.Book),
+		memberMap: make(map[int]models.member),
+	}
 }
 
 // method implementations
@@ -27,12 +36,11 @@ func (l *Library) AddBook(book models.Book) {
 	l.bookMap[book.ID] = book
 }
 
-
 func (l *Library) RemoveBook(bookID int) {
-	delete(l.bookMap,bookId)
+	delete(l.bookMap,bookID)
 }
 
-func (l *Library) BorrowBook(bookID int, memberID int) errors {
+func (l *Library) BorrowBook(bookID int, memberID int) error {
 	// is book avalable 
 	book, exists := l.bookMap[bookID]
 
@@ -64,7 +72,7 @@ func (l *Library) BorrowBook(bookID int, memberID int) errors {
 }
 
 
-func (l *Library) ReturnBook(bookID int, memberID int) errors{
+func (l *Library) ReturnBook(bookID int, memberID int) error{
 	// is book avalable 
 	book, exists := l.bookMap[bookID]
 
