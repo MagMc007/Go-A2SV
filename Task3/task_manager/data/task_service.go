@@ -18,6 +18,12 @@ type TaskServices interface {
 	DeleteTask(id int) error
 }
 
+func NewTaskService() *TaskServices {
+	return &TaskServices{
+		tasks: make([]models.Task, 0),
+	}
+}
+
 // extend each method in the interface and implement
 func (t *[]models.Task) AddTask(task models.Task) models.Task {
 	*t = append(*t, task)
