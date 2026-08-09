@@ -3,6 +3,8 @@ package data
 import (
 	"errors"
 
+	"go.mongodb.org/mongo-driver/mongo"
+
 	"task_manager/models"
 )
 
@@ -15,12 +17,12 @@ type TaskServices interface {
 }
 
 type TaskService struct {
-	tasks []models.Task
+	collection *mongo.Collection
 }
 
-func NewTaskService() *TaskService {
+func NewTaskService(collection *mongo.Collection) *TaskService {
 	return &TaskService{
-		tasks: make([]models.Task, 0),
+		collection: collection,
 	}
 }
 
