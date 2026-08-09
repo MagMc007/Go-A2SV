@@ -4,18 +4,24 @@ A simple **Task Management REST API** built with **Go** and the **Gin Web Framew
 
 ## Features
 
-* Create a new task
-* Get all tasks
-* Get a task by ID
-* Update a task
-* Delete a task
+- Create a new task
+- Get all tasks
+- Get a task by ID
+- Update a task
+- Delete a task
+
 ---
 
 ## Technologies
-* **Go**
-* **Gin Web Framework**
-* **Postman**
-* In-memory storage using Go slices
+
+- **Go**
+- **Gin Web Framework**
+- **MongoDB**
+- **MongoDB Go Driver**
+- **Postman**
+
+The API uses **MongoDB for persistent data storage**, replacing the previous in-memory slice-based storage.
+
 ---
 
 ## Project Structure
@@ -49,7 +55,7 @@ Contains the data structures used by the application.
 
 #### `data/`
 
-Contains the task service and the business logic for creating, retrieving, updating, and deleting tasks.
+Contains the task service and the business logic for interacting with MongoDB. It implements the CRUD operations using the MongoDB Go Driver.
 
 #### `controllers/`
 
@@ -69,29 +75,33 @@ Contains additional API documentation.
 
 Each task contains the following fields:
 
-| Field         | Type    | Description                   |
-| ------------- | ------- | ----------------------------- |
-| `id`          | integer | Unique identifier of the task |
-| `title`       | string  | Title of the task             |
-| `description` | string  | Description of the task       |
-| `dueDate`     | time    | Deadline for the task         |
-| `status`      | string  | Current status of the task    |
+| Field         | Type     | Description                           |
+| ------------- | -------- | ------------------------------------- |
+| `id`          | ObjectID | Unique MongoDB identifier of the task |
+| `title`       | string   | Title of the task                     |
+| `description` | string   | Description of the task               |
+| `dueDate`     | time     | Deadline for the task                 |
+| `status`      | string   | Current status of the task            |
+
+MongoDB automatically generates the `id` (`_id`) when a new task is created.
 
 Example:
 
 ```json
 {
-    "id": 1,
-    "title": "Learn Go",
-    "description": "Learn Gin and build a REST API",
-    "dueDate": "2026-08-15T00:00:00Z",
-    "status": "pending"
+  "id": "6a78e0aace3ad04c3ba7aa66",
+  "title": "Learn Gin/go",
+  "description": "Study Gin framework",
+  "dueDate": "2026-08-10T00:00:00Z",
+  "status": "pending"
 }
 ```
 
+When creating a task, the `id` does not need to be included in the request body because MongoDB generates it automatically.
+
 ---
 
-# API Endpoints
+## API Endpoints
 
 Base URL:
 
@@ -119,13 +129,13 @@ GET http://localhost:8080/tasks
 
 ```json
 [
-    {
-        "id": 1,
-        "title": "Learn Go",
-        "description": "Learn Gin framework",
-        "dueDate": "2026-08-15T00:00:00Z",
-        "status": "pending"
-    }
+  {
+    "id": 1,
+    "title": "Learn Go",
+    "description": "Learn Gin framework",
+    "dueDate": "2026-08-15T00:00:00Z",
+    "status": "pending"
+  }
 ]
 ```
 
@@ -151,11 +161,11 @@ GET http://localhost:8080/tasks/1
 
 ```json
 {
-    "id": 1,
-    "title": "Learn Go",
-    "description": "Learn Gin framework",
-    "dueDate": "2026-08-15T00:00:00Z",
-    "status": "pending"
+  "id": 1,
+  "title": "Learn Go",
+  "description": "Learn Gin framework",
+  "dueDate": "2026-08-15T00:00:00Z",
+  "status": "pending"
 }
 ```
 
@@ -165,7 +175,7 @@ GET http://localhost:8080/tasks/1
 
 ```json
 {
-    "error": "invalid task ID"
+  "error": "invalid task ID"
 }
 ```
 
@@ -175,7 +185,7 @@ GET http://localhost:8080/tasks/1
 
 ```json
 {
-    "error": "task with this ID does not exist"
+  "error": "task with this ID does not exist"
 }
 ```
 
@@ -199,11 +209,11 @@ POST http://localhost:8080/tasks
 
 ```json
 {
-    "id": 1,
-    "title": "Learn Go",
-    "description": "Learn Gin framework",
-    "dueDate": "2026-08-15T00:00:00Z",
-    "status": "pending"
+  "id": 1,
+  "title": "Learn Go",
+  "description": "Learn Gin framework",
+  "dueDate": "2026-08-15T00:00:00Z",
+  "status": "pending"
 }
 ```
 
@@ -213,11 +223,11 @@ POST http://localhost:8080/tasks
 
 ```json
 {
-    "id": 1,
-    "title": "Learn Go",
-    "description": "Learn Gin framework",
-    "dueDate": "2026-08-15T00:00:00Z",
-    "status": "pending"
+  "id": 1,
+  "title": "Learn Go",
+  "description": "Learn Gin framework",
+  "dueDate": "2026-08-15T00:00:00Z",
+  "status": "pending"
 }
 ```
 
@@ -227,7 +237,7 @@ POST http://localhost:8080/tasks
 
 ```json
 {
-    "error": "invalid request body"
+  "error": "invalid request body"
 }
 ```
 
@@ -251,11 +261,11 @@ PUT http://localhost:8080/tasks/1
 
 ```json
 {
-    "id": 1,
-    "title": "Learn Gin",
-    "description": "Build a Task Management API",
-    "dueDate": "2026-08-20T00:00:00Z",
-    "status": "completed"
+  "id": 1,
+  "title": "Learn Gin",
+  "description": "Build a Task Management API",
+  "dueDate": "2026-08-20T00:00:00Z",
+  "status": "completed"
 }
 ```
 
@@ -265,11 +275,11 @@ PUT http://localhost:8080/tasks/1
 
 ```json
 {
-    "id": 1,
-    "title": "Learn Gin",
-    "description": "Build a Task Management API",
-    "dueDate": "2026-08-20T00:00:00Z",
-    "status": "completed"
+  "id": 1,
+  "title": "Learn Gin",
+  "description": "Build a Task Management API",
+  "dueDate": "2026-08-20T00:00:00Z",
+  "status": "completed"
 }
 ```
 
@@ -279,7 +289,7 @@ PUT http://localhost:8080/tasks/1
 
 ```json
 {
-    "error": "invalid task ID"
+  "error": "invalid task ID"
 }
 ```
 
@@ -289,7 +299,7 @@ PUT http://localhost:8080/tasks/1
 
 ```json
 {
-    "error": "task with this ID does not exist"
+  "error": "task with this ID does not exist"
 }
 ```
 
@@ -321,7 +331,7 @@ No response body is returned.
 
 ```json
 {
-    "error": "invalid task ID"
+  "error": "invalid task ID"
 }
 ```
 
@@ -331,7 +341,7 @@ No response body is returned.
 
 ```json
 {
-    "error": "task with this ID does not exist"
+  "error": "task with this ID does not exist"
 }
 ```
 
@@ -379,20 +389,20 @@ Receives HTTP requests and directs them to the appropriate controller.
 
 Handles HTTP-specific concerns such as:
 
-* Request parsing
-* JSON binding
-* HTTP status codes
-* HTTP responses
+- Request parsing
+- JSON binding
+- HTTP status codes
+- HTTP responses
 
 ### Service
 
 Contains the task management logic:
 
-* Add task
-* Get tasks
-* Get task by ID
-* Update task
-* Delete task
+- Add task
+- Get tasks
+- Get task by ID
+- Update task
+- Delete task
 
 ### Model
 
