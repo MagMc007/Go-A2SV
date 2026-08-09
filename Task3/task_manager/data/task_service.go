@@ -6,62 +6,62 @@ import (
 	"task_manager/models"
 )
 
-// prepare services for CRUD ops
-// prepare an interface
-
 type TaskServices interface {
 	AddTask(task models.Task) models.Task
 	GetAllTasks() []models.Task
-
 	GetTaskDetails(id int) (models.Task, error)
-	UpdateTask(id int, task model.Task) (models.Task, error)
+	UpdateTask(id int, task models.Task) (models.Task, error)
 	DeleteTask(id int) error
 }
 
-func NewTaskService() *TaskServices {
-	return &TaskServices{
+type TaskService struct {
+	tasks []models.Task
+}
+
+func NewTaskService() *TaskService {
+	return &TaskService{
 		tasks: make([]models.Task, 0),
 	}
 }
 
-// extend each method in the interface and implement
-func (t *[]models.Task) AddTask(task models.Task) models.Task {
-	*t = append(*t, task)
+func (t *TaskService) AddTask(task models.Task) models.Task {
+	t.tasks = append(t.tasks, task)
 
 	return task
 }
 
-func (t *[]models.Task) GetAllTasks() []models.Task{
-	return *t
+func (t *TaskService) GetAllTasks() []models.Task {
+	return t.tasks
 }
 
-func (t *[]models.Task) GetTaskDetails(id int) (models.Task, error) {
-	for _, v := range *t {
+func (t *TaskService) GetTaskDetails(id int) (models.Task, error) {
+	for _, v := range t.tasks {
 		if id == v.ID {
-			return (v, nil)
+			return v, nil
 		}
 	}
 
-	return (models.Task{}, errors.New("Task with this ID does not exist"))
+	return models.Task{}, errors.New("task with this ID does not exist")
 }
 
-
-func (t *[]models.Task) UpdateTask(id int, task models.Task) (models.Task, error) {
-	for i, v := range *t {
+func (t *TaskService) UpdateTask(id int, task models.Task) (models.Task, error) {
+	for i, v := range t.tasks {
 		if id == v.ID {
-			(*t)[i] = task	
+			t.tasks[i] = task
+			return task, nil
 		}
 	}
 
-	return (models.Task{}, errors.New("Task with this ID does not exist"))	
+	return models.Task{}, errors.New("task with this ID does not exist")
 }
 
-func (t *[]models.Task) DeleteTask(id int) error {
-	for i, v := range *t {
+func (t *TaskService) DeleteTask(id int) error {
+	for i, v := range t.tasks {
 		if id == v.ID {
-			(*t) = append((*t)[:i], (*t)[i+1:]...)
+			t.tasks = append(t.tasks[:i], t.tasks[i+1:]...)
+			return nil
 		}
 	}
 
-	return (errors.New("Task with this ID does not exist"))	
+	return errors.New("task with this ID does not exist")
 }

@@ -9,7 +9,6 @@ import (
 	"task_manager/models"
 )
 
-
 type TaskController struct {
 	taskService data.TaskServices
 }
@@ -103,11 +102,11 @@ func (t *TaskController) DeleteTask(c *gin.Context) {
 		return
 	}
 
-	err := t.taskService.DeleteTask(id)
+	err = t.taskService.DeleteTask(id)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{
-			"error": err.Error()
+			"error": err.Error(),
 		})
 		return 
 	}
