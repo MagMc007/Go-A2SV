@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"net/http"
+
 	"github.com/gin-gonic/gin"
-	"strconv"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"task_manager/data"
 	"task_manager/models"
@@ -30,18 +31,33 @@ func (t *TaskController) AddTask(c *gin.Context) {
 		return
 	}
 
-	t.taskService.AddTask(newTask)
-	c.IndentedJSON(http.StatusCreated, newTask)
+	createdTask, err := t.taskService.AddTask(newTask)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusCreated, createdTask)
 }
 
 func (t *TaskController) GetAllTasks(c *gin.Context) {
-	allTasks := t.taskService.GetAllTasks()
+	allTasks, err := t.taskService.GetAllTasks()
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 
 	c.IndentedJSON(http.StatusOK, allTasks)
 }
 
 func (t *TaskController) GetTaskDetails(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -51,7 +67,6 @@ func (t *TaskController) GetTaskDetails(c *gin.Context) {
 	}
 
 	task, err := t.taskService.GetTaskDetails(id)
-
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{
 			"error": err.Error(),
@@ -63,7 +78,7 @@ func (t *TaskController) GetTaskDetails(c *gin.Context) {
 }
 
 func (t *TaskController) UpdateTask(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -93,7 +108,7 @@ func (t *TaskController) UpdateTask(c *gin.Context) {
 
 
 func (t *TaskController) DeleteTask(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{

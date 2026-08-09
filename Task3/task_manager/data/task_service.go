@@ -13,11 +13,11 @@ import (
 )
 
 type TaskServices interface {
-	AddTask(task models.Task) models.Task
-	GetAllTasks() []models.Task
-	GetTaskDetails(id int) (models.Task, error)
-	UpdateTask(id int, task models.Task) (models.Task, error)
-	DeleteTask(id int) error
+	AddTask(task models.Task) (models.Task, error)
+	GetAllTasks() ([]models.Task, error)
+	GetTaskDetails(id primitive.ObjectID) (models.Task, error)
+	UpdateTask(id primitive.ObjectID, task models.Task) (models.Task, error)
+	DeleteTask(id primitive.ObjectID) error
 }
 
 type TaskService struct {
