@@ -15,9 +15,15 @@ type UserService struct {
     collection *mongo.Collection
 }
 
+
+func NewUserService(collection *mongo.Collection) *UserService {
+	return &UserService{
+		collection: collection,
+	}
+}
+
 type UserServices interface {
 	Register(user models.User) (models.User, error)
-	GetUserByUsername(username string) (models.User, error)
 }
 
 func (u *UserService) Register(user models.User) (models.User, error) {

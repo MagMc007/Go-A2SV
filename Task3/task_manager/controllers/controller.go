@@ -10,17 +10,22 @@ import (
 	"task_manager/models"
 )
 
-type TaskController struct {
+type Controller struct {
 	taskService data.TaskServices
+	userService data.UserServices
 }
 
-func NewTaskController(taskService *data.TaskService) *TaskController {
-	return &TaskController{
+func NewController(
+	taskService *data.TaskService,
+	userService *data.UserService,
+	) *Controller {
+	return &Controller{
 		taskService: taskService,
+		userService: userService,
 	}
 }
 
-func (t *TaskController) AddTask(c *gin.Context) {
+func (t *Controller) AddTask(c *gin.Context) {
 	var newTask models.Task
 
 	// is there an error
@@ -43,7 +48,7 @@ func (t *TaskController) AddTask(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, createdTask)
 }
 
-func (t *TaskController) GetAllTasks(c *gin.Context) {
+func (t *Controller) GetAllTasks(c *gin.Context) {
 	allTasks, err := t.taskService.GetAllTasks()
 
 	if err != nil {
@@ -56,7 +61,7 @@ func (t *TaskController) GetAllTasks(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, allTasks)
 }
 
-func (t *TaskController) GetTaskDetails(c *gin.Context) {
+func (t *Controller) GetTaskDetails(c *gin.Context) {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
 	if err != nil {
@@ -77,7 +82,7 @@ func (t *TaskController) GetTaskDetails(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, task)
 }
 
-func (t *TaskController) UpdateTask(c *gin.Context) {
+func (t *Controller) UpdateTask(c *gin.Context) {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
 	if err != nil {
@@ -107,7 +112,7 @@ func (t *TaskController) UpdateTask(c *gin.Context) {
 }
 
 
-func (t *TaskController) DeleteTask(c *gin.Context) {
+func (t *Controller) DeleteTask(c *gin.Context) {
 	id, err := primitive.ObjectIDFromHex(c.Param("id"))
 
 	if err != nil {
@@ -128,3 +133,35 @@ func (t *TaskController) DeleteTask(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+
+func (t * Controller) Register(c *gin.Context) {
+	var newUser models.User
+
+	if err := c.ShouldBindJSON(&newUser); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request body",
+		})
+	}
+
+	// set default user role to user(normal one)
+	newUser.Role = "user"
+
+	createdUser, err := t.userService.Register(newUser)
+
+	if err != nil {
+		if err.Error() == "username already exists" {
+			c.IndentedJSON(http.StatusConflict, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
+		"error": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusCreated, createdUser)
+} 

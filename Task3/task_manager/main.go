@@ -15,10 +15,16 @@ func main() {
 	}
 
 	database := client.Database("TaskManager")
-	collection := database.Collection("tasks")
+	taskCollection := database.Collection("tasks")
+	userCollection := database.Collection("users")
 
-	service := data.NewTaskService(collection)
-	controller := controllers.NewTaskController(service)
+	taskService := data.NewTaskService(taskCollection)
+	userService := data.NewUserService(userCollection)
+
+	controller := controllers.NewController(
+		taskService,
+		userService,
+	)
 
 	r:= router.SetupRouter(controller)
 
