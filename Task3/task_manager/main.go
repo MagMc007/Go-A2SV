@@ -6,9 +6,17 @@ import (
 	"task_manager/controllers"
 	"task_manager/data"
 	"task_manager/router"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatal("Error loading .env")
+	}
+
 	client, err := data.ConnectDB()
 	if err != nil {
 		log.Fatal(err)

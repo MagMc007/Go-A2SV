@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"task_manager/models"
 	"time"
@@ -26,6 +27,7 @@ func NewUserService(collection *mongo.Collection) *UserService {
 
 type UserServices interface {
 	Register(user models.User) (models.User, error)
+	Login(username string, password string) (string, error)
 }
 
 func (u *UserService) Register(user models.User) (models.User, error) {
@@ -74,12 +76,12 @@ func (u *UserService) Login(username string, password string) (string, error) {
 
 	var user models.User
 
-	// find the user
+	// Find the user
 	err := u.collection.FindOne(
-		ctx, 
+		ctx,
 		bson.M{"username": username},
 	).Decode(&user)
-	
+
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return "", errors.New("invalid username or password")
@@ -88,6 +90,10 @@ func (u *UserService) Login(username string, password string) (string, error) {
 		return "", err
 	}
 
+	fmt.Println("STORED HASH:", user.Password)
+	fmt.Println("PASSWORD RECEIVED:", password)
+
+	// Compare provided password with stored hash
 	err = bcrypt.CompareHashAndPassword(
 		[]byte(user.Password),
 		[]byte(password),
@@ -97,7 +103,7 @@ func (u *UserService) Login(username string, password string) (string, error) {
 		return "", errors.New("invalid username or password")
 	}
 
-	// put claims into the JWT
+	// Put claims into the JWT
 	claims := jwt.MapClaims{
 		"user_id":  user.ID.Hex(),
 		"username": user.Username,
@@ -110,7 +116,9 @@ func (u *UserService) Login(username string, password string) (string, error) {
 		claims,
 	)
 
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	tokenString, err := token.SignedString(
+		[]byte(os.Getenv("JWT_SECRET")),
+	)
 
 	if err != nil {
 		return "", err

@@ -165,3 +165,37 @@ func (t * Controller) Register(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusCreated, createdUser)
 } 
+
+func (t *Controller) Login(c *gin.Context) {
+    var loginRequest models.LoginRequest
+
+    if err := c.ShouldBindJSON(&loginRequest); err != nil {
+        c.IndentedJSON(http.StatusBadRequest, gin.H{
+            "error": "invalid request body",
+        })
+        return
+    }
+
+    token, err := t.userService.Login(
+        loginRequest.Username,
+        loginRequest.Password,
+    )
+
+    if err != nil {
+        if err.Error() == "invalid username or password" {
+            c.IndentedJSON(http.StatusUnauthorized, gin.H{
+                "error": err.Error(),
+            })
+            return
+        }
+
+        c.IndentedJSON(http.StatusInternalServerError, gin.H{
+            "error": err.Error(),
+        })
+        return
+    }
+
+    c.IndentedJSON(http.StatusOK, gin.H{
+        "token": token,
+    })
+}

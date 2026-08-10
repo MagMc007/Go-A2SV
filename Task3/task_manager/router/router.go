@@ -19,6 +19,7 @@ func SetupRouter(controller *controllers.Controller) *gin.Engine {
 	router.DELETE("/tasks/:id", controller.DeleteTask)
 
 	router.POST("/register", controller.Register)
+	router.POST("/login", controller.Login)
 
 	return router
 }
