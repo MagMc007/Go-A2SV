@@ -3,20 +3,22 @@ package router
 import (
 	"task_manager/controllers"
 
+	"task_manager/middleware"
+
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRouter(controller *controllers.Controller) *gin.Engine {
 	router := gin.Default()
 
-	router.GET("/tasks", controller.GetAllTasks)
-	router.GET("/tasks/:id", controller.GetTaskDetails)
+	protected := router.Group("/tasks")
+	protected.Use(middleware.AuthMiddleware())
 
-	router.POST("/tasks", controller.AddTask)
-
-	router.PUT("/tasks/:id", controller.UpdateTask)
-	
-	router.DELETE("/tasks/:id", controller.DeleteTask)
+	protected.GET("", controller.GetAllTasks)
+	protected.GET("/:id", controller.GetTaskDetails)
+	protected.POST("", controller.AddTask)
+	protected.PUT("/:id", controller.UpdateTask)
+	protected.DELETE("/:id", controller.DeleteTask)
 
 	router.POST("/register", controller.Register)
 	router.POST("/login", controller.Login)
