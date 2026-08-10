@@ -3,9 +3,11 @@ package data
 import (
 	"context"
 	"errors"
+	"os"
 	"task_manager/models"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
@@ -64,4 +66,55 @@ func (u *UserService) Register(user models.User) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (u *UserService) Login(username string, password string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var user models.User
+
+	// find the user
+	err := u.collection.FindOne(
+		ctx, 
+		bson.M{"username": username},
+	).Decode(&user)
+	
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return "", errors.New("invalid username or password")
+		}
+
+		return "", err
+	}
+
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(user.Password),
+		[]byte(password),
+	)
+
+	if err != nil {
+		return "", errors.New("invalid username or password")
+	}
+
+	// put claims into the JWT
+	claims := jwt.MapClaims{
+		"user_id":  user.ID.Hex(),
+		"username": user.Username,
+		"role":     user.Role,
+		"exp":      time.Now().Add(time.Hour).Unix(),
+	}
+
+	token := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		claims,
+	)
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
