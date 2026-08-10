@@ -60,7 +60,46 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		claims, ok := token.Claims.(jwt.MapClaims)
+
+		if !ok {
+			c.IndentedJSON(http.StatusUnauthorized, gin.H{
+				"error": "invalid token claims",
+			})
+			c.Abort()
+			return
+		}
+
+		c.Set("user_id", claims["user_id"])
+		c.Set("username", claims["username"])
+		c.Set("role", claims["role"])
+
 		// valid
+		c.Next()
+	}
+}
+
+
+func AdminOnly() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, exists := c.Get("role")
+
+		if !exists {
+			c.IndentedJSON(http.StatusUnauthorized, gin.H{
+				"error": "user role not found",
+			})
+			c.Abort()
+			return
+		}
+
+		if role != "admin" {
+			c.IndentedJSON(http.StatusForbidden, gin.H{
+				"error": "admin access required",
+			})
+			c.Abort()
+			return
+		}
+
 		c.Next()
 	}
 }

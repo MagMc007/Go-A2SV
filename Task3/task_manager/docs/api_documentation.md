@@ -9,6 +9,10 @@ A simple **Task Management REST API** built with **Go** and the **Gin Web Framew
 - Get a task by ID
 - Update a task
 - Delete a task
+- User registration
+- JWT-based authentication
+- Role-based authorization
+- Protected task endpoints
 
 ---
 
@@ -26,22 +30,25 @@ The API uses **MongoDB for persistent data storage**, replacing the previous in-
 
 ## Project Structure
 
-```text
+````text
 task_manager/
 ├── main.go
 ├── controllers/
-│   └── task_controller.go
+│   └── controller.go
 ├── models/
-│   └── task.go
+│   ├── task.go
+│   └── user.go
 ├── data/
-│   └── task_service.go
+│   ├── task_service.go
+│   └── user_service.go
+├── middleware/
+│   └── auth_middleware.go
 ├── router/
 │   └── router.go
 ├── docs/
 │   └── api_documentation.md
 ├── go.mod
 └── go.sum
-```
 
 ### Folder Responsibilities
 
@@ -52,6 +59,10 @@ The entry point of the application. It initializes the service, controller, rout
 #### `models/`
 
 Contains the data structures used by the application.
+
+#### `middleware/`
+
+Contains authentication and authorization middleware. It validates JWT tokens and restricts access to routes based on user roles.
 
 #### `data/`
 
@@ -95,9 +106,31 @@ Example:
   "dueDate": "2026-08-10T00:00:00Z",
   "status": "pending"
 }
-```
+````
 
 When creating a task, the `id` does not need to be included in the request body because MongoDB generates it automatically.
+
+## User Model
+
+Each user contains the following fields:
+
+| Field      | Type     | Description                   |
+| ---------- | -------- | ----------------------------- |
+| `id`       | ObjectID | Unique MongoDB identifier     |
+| `username` | string   | Unique username               |
+| `password` | string   | Hashed user password          |
+| `role`     | string   | User role (`user` or `admin`) |
+
+Passwords are never stored as plain text. They are hashed using **bcrypt** before being stored in MongoDB.
+
+Example user:
+
+```json
+{
+  "username": "mag2",
+  "role": "user"
+}
+```
 
 ---
 
@@ -109,7 +142,62 @@ Base URL:
 http://localhost:8080
 ```
 
-## 1. Get All Tasks
+## Authentication
+
+The API uses **JWT (JSON Web Tokens)** for authentication.
+
+Users must register and log in before accessing protected task endpoints.
+
+## Register
+
+```http
+POST /register
+```
+
+example request:
+POST http://localhost:8080/register
+
+Body:
+{
+"username": "mag2",
+"password": "qwerty123",
+"role":
+}
+
+success response
+201 Created:
+{
+"message": "user registered successfully"
+}
+
+## Login
+
+```
+POST /login
+```
+
+example request:
+POST http://localhost:8080/login
+
+Body:
+{
+"username": "mag2",
+"password": "qwerty123",
+}
+
+responses:
+200 OK:
+{
+"token": <jwt>
+}
+401 Unauthorized
+{
+"error": "invalid username or password"
+}
+
+## Note all endpoints below need to have bearer toke in the auth header
+
+## Get All Tasks
 
 ```http
 GET /tasks
@@ -121,6 +209,10 @@ Returns all tasks currently stored in memory.
 
 ```text
 GET http://localhost:8080/tasks
+```
+
+```
+This endpoint is for admin only
 ```
 
 ### Success Response
@@ -141,7 +233,7 @@ GET http://localhost:8080/tasks
 
 ---
 
-## 2. Get Task by ID
+## Get Task by ID
 
 ```http
 GET /tasks/:id
@@ -191,7 +283,7 @@ GET http://localhost:8080/tasks/1
 
 ---
 
-## 3. Create a Task
+## Create a Task
 
 ```http
 POST /tasks
@@ -243,7 +335,7 @@ POST http://localhost:8080/tasks
 
 ---
 
-## 4. Update a Task
+## Update a Task
 
 ```http
 PUT /tasks/:id
@@ -305,7 +397,7 @@ PUT http://localhost:8080/tasks/1
 
 ---
 
-## 5. Delete a Task
+## Delete a Task
 
 ```http
 DELETE /tasks/:id

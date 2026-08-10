@@ -14,7 +14,12 @@ func SetupRouter(controller *controllers.Controller) *gin.Engine {
 	protected := router.Group("/tasks")
 	protected.Use(middleware.AuthMiddleware())
 
-	protected.GET("", controller.GetAllTasks)
+	protected.GET(
+		"",
+		middleware.AdminOnly(),
+		controller.GetAllTasks,
+	)
+
 	protected.GET("/:id", controller.GetTaskDetails)
 	protected.POST("", controller.AddTask)
 	protected.PUT("/:id", controller.UpdateTask)

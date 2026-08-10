@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -49,15 +50,21 @@ func (t *Controller) AddTask(c *gin.Context) {
 }
 
 func (t *Controller) GetAllTasks(c *gin.Context) {
+
+	role, exists := c.Get("role")
+
+	fmt.Println("ROLE:", role)
+	fmt.Println("EXISTS:", exists)
+
 	allTasks, err := t.taskService.GetAllTasks()
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"error": "failed to get all tasks",
 		})
 		return
 	}
-
+	
 	c.IndentedJSON(http.StatusOK, allTasks)
 }
 
