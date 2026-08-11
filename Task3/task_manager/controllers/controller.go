@@ -53,8 +53,8 @@ func (t *Controller) GetAllTasks(c *gin.Context) {
 
 	role, exists := c.Get("role")
 
-	fmt.Println("ROLE:", role)
-	fmt.Println("EXISTS:", exists)
+	// fmt.Println("ROLE:", role)
+	// fmt.Println("EXISTS:", exists)
 
 	allTasks, err := t.taskService.GetAllTasks()
 

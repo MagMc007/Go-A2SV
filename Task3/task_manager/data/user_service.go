@@ -90,8 +90,8 @@ func (u *UserService) Login(username string, password string) (string, error) {
 		return "", err
 	}
 
-	fmt.Println("STORED HASH:", user.Password)
-	fmt.Println("PASSWORD RECEIVED:", password)
+	// fmt.Println("STORED HASH:", user.Password)
+	// fmt.Println("PASSWORD RECEIVED:", password)
 
 	// Compare provided password with stored hash
 	err = bcrypt.CompareHashAndPassword(

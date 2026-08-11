@@ -22,6 +22,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
+    defer func() {
+        if err := client.Disconnect(ctx); err != nil {
+            log.Printf("Error disconnecting MongoDB: %v", err)
+        }
+    }()
+
 	database := client.Database("TaskManager")
 	taskCollection := database.Collection("tasks")
 	userCollection := database.Collection("users")
