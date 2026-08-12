@@ -30,25 +30,29 @@ The API uses **MongoDB for persistent data storage**, replacing the previous in-
 
 ## Project Structure
 
-````text
-task_manager/
-├── main.go
-├── controllers/
-│   └── controller.go
-├── models/
-│   ├── task.go
-│   └── user.go
-├── data/
-│   ├── task_service.go
-│   └── user_service.go
-├── middleware/
-│   └── auth_middleware.go
-├── router/
-│   └── router.go
-├── docs/
-│   └── api_documentation.md
-├── go.mod
-└── go.sum
+```
+
+task-manager/
+├── Delivery/
+│   ├── main.go
+│   ├── controllers/
+│   │   └── controller.go
+│   └── routers/
+│       └── router.go
+├── Domain/
+│   └── domain.go
+├── Infrastructure/
+│   ├── auth_middleWare.go
+│   ├── jwt_service.go
+│   └── password_service.go
+├── Repositories/
+│   ├── task_repository.go
+│   └── user_repository.go
+└── Usecases/
+    ├── task_usecases.go
+    └── user_usecases.go
+
+```
 
 ### Folder Responsibilities
 
@@ -56,17 +60,31 @@ task_manager/
 
 The entry point of the application. It initializes the service, controller, router, and starts the HTTP server.
 
-#### `models/`
+#### `domain/`
 
-Contains the data structures used by the application.
+Contains the data structures, interfaces used by the application.
 
-#### `middleware/`
+#### `infrastructure/`
 
-Contains authentication and authorization middleware. It validates JWT tokens and restricts access to routes based on user roles.
+Contains files for authentication and authorization (middleware), for validating JWT tokens, password hashing.
+
+### Repsitory
+
+constains files that perform CRUD(only database interaction)
+
+### usecase
+
+contains files that define the business logic and validation
 
 #### `data/`
 
-Contains the task service and the business logic for interacting with MongoDB. It implements the CRUD operations using the MongoDB Go Driver.
+Contains the MongoDB Go Driver.
+
+#### `docs/`
+
+Contains additional API documentation.
+
+### With in `delivery`
 
 #### `controllers/`
 
@@ -75,10 +93,6 @@ Handles HTTP requests and responses and communicates with the task service.
 #### `router/`
 
 Defines the API routes and connects them to the appropriate controller methods.
-
-#### `docs/`
-
-Contains additional API documentation.
 
 ---
 
@@ -106,7 +120,7 @@ Example:
   "dueDate": "2026-08-10T00:00:00Z",
   "status": "pending"
 }
-````
+```
 
 When creating a task, the `id` does not need to be included in the request body because MongoDB generates it automatically.
 

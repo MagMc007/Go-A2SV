@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"errors"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -38,6 +39,7 @@ func (uu *UserUsecase) Register(user domain.User) (domain.User, error) {
 	}
 
 	user.Password = hashedPassword
+	fmt.Println(user)
 
 	return uu.userRepository.Register(user)
 }

@@ -141,9 +141,6 @@ func (t * Controller) Register(c *gin.Context) {
 		return
 	}
 
-	// set default user role to user(normal one)
-	newUser.Role = "user"
-
 	createdUser, err := t.userUseCase.Register(newUser)
 
 	if err != nil {
