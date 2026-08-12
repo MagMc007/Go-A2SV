@@ -43,7 +43,7 @@ type TaskUsecase interface {
 // usecase
 type UserRepository interface {
 	Register(user User) (User, error)
-	GetByUsername(username string) (User, error)
+
 }
 
 
