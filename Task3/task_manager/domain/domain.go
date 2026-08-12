@@ -40,13 +40,14 @@ type TaskUsecase interface {
 	DeleteTask(id primitive.ObjectID) error
 }
 
-// usecases
+// usecase
 type UserRepository interface {
 	Register(user User) (User, error)
-	Login(username string, password string) (string, error)
+	GetByUsername(username string) (User, error)
 }
+
 
 type UserUsecase interface {
     Register(user User) (User, error)
-	Login(username string, password string) (string, error)
+    Login(username string, password string) (string, error)
 }
