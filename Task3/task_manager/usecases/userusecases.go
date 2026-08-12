@@ -29,7 +29,7 @@ func (ur *UserUsecase) Register(user domain.User) (domain.User, error) {
 
 	if err != mongo.ErrNoDocuments {
 		return domain.User{}, err
-	
+	}
 
 	// hash pwd
 	hashedPassword, err := infrastructure.HashPwd([]byte(user.Password))

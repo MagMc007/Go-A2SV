@@ -1,33 +1,28 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	"task_manager/data"
-	"task_manager/models"
+	"task_manager/domain"
 )
 
 type Controller struct {
-	taskService data.TaskServices
-	userService data.UserServices
+	taskUseCase domain.TaskUsecase
+	userUseCase domain.UserUsecase
 }
 
-func NewController(
-	taskService *data.TaskService,
-	userService *data.UserService,
-	) *Controller {
+func NewController(taskUseCase domain.TaskUsecase, userUseCase domain.UserUsecase) *Controller {
 	return &Controller{
-		taskService: taskService,
-		userService: userService,
+		taskUseCase: taskUseCase,
+		userUseCase: userUseCase,
 	}
 }
 
 func (t *Controller) AddTask(c *gin.Context) {
-	var newTask models.Task
+	var newTask domain.Task
 
 	// is there an error
 	if err := c.ShouldBindJSON(&newTask); err != nil {
@@ -37,7 +32,7 @@ func (t *Controller) AddTask(c *gin.Context) {
 		return
 	}
 
-	createdTask, err := t.taskService.AddTask(newTask)
+	createdTask, err := t.taskUseCase.AddTask(newTask)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{
@@ -50,13 +45,7 @@ func (t *Controller) AddTask(c *gin.Context) {
 }
 
 func (t *Controller) GetAllTasks(c *gin.Context) {
-
-	role, exists := c.Get("role")
-
-	// fmt.Println("ROLE:", role)
-	// fmt.Println("EXISTS:", exists)
-
-	allTasks, err := t.taskService.GetAllTasks()
+	allTasks, err := t.taskUseCase.GetAllTasks()
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{
@@ -78,7 +67,7 @@ func (t *Controller) GetTaskDetails(c *gin.Context) {
 		return
 	}
 
-	task, err := t.taskService.GetTaskDetails(id)
+	task, err := t.taskUseCase.GetTaskDetails(id)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{
 			"error": err.Error(),
@@ -99,7 +88,7 @@ func (t *Controller) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	var task models.Task
+	var task domain.Task
 	
 	if err := c.BindJSON(&task); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -108,7 +97,7 @@ func (t *Controller) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	updatedTask, err := t.taskService.UpdateTask(id, task)
+	updatedTask, err := t.taskUseCase.UpdateTask(id, task)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, err)
@@ -129,7 +118,7 @@ func (t *Controller) DeleteTask(c *gin.Context) {
 		return
 	}
 
-	err = t.taskService.DeleteTask(id)
+	err = t.taskUseCase.DeleteTask(id)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{
@@ -143,18 +132,19 @@ func (t *Controller) DeleteTask(c *gin.Context) {
 
 
 func (t * Controller) Register(c *gin.Context) {
-	var newUser models.User
+	var newUser domain.User
 
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid request body",
 		})
+		return
 	}
 
 	// set default user role to user(normal one)
 	newUser.Role = "user"
 
-	createdUser, err := t.userService.Register(newUser)
+	createdUser, err := t.userUseCase.Register(newUser)
 
 	if err != nil {
 		if err.Error() == "username already exists" {
@@ -174,7 +164,7 @@ func (t * Controller) Register(c *gin.Context) {
 } 
 
 func (t *Controller) Login(c *gin.Context) {
-    var loginRequest models.LoginRequest
+    var loginRequest domain.LoginRequest
 
     if err := c.ShouldBindJSON(&loginRequest); err != nil {
         c.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -183,7 +173,7 @@ func (t *Controller) Login(c *gin.Context) {
         return
     }
 
-    token, err := t.userService.Login(
+    token, err := t.userUseCase.Login(
         loginRequest.Username,
         loginRequest.Password,
     )

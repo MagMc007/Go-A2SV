@@ -51,3 +51,8 @@ type UserUsecase interface {
     Register(user User) (User, error)
     Login(username string, password string) (string, error)
 }
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
