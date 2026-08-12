@@ -9,20 +9,20 @@ import (
 	"task_manager/infrastructure"
 )
 
-type UserUseCase struct {
-    userRepository domain.UserRepository
+type UserUsecase struct {
+	userRepository domain.UserRepository
 }
 
-func NewUserUseCase(collection *mongo.Collection) *UserUseCase {
-	return &UserUserCase{
+func NewUserUsecase(userRepository domain.UserRepository) domain.UserUsecase {
+	return &UserUsecase{
 		userRepository: userRepository,
 	}
 }
 
-func (ur *UserUsecase) Register(user domain.User) (domain.User, error) {
+func (uu *UserUsecase) Register(user domain.User) (domain.User, error) {
 	// lookup username
 	_, err := uu.userRepository.GetByUsername(user.Username)
-	
+
 	if err == nil {
 		return domain.User{}, errors.New("username already exists")
 	}

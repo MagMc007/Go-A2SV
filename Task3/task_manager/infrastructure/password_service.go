@@ -1,10 +1,7 @@
 package infrastructure
 
 import 	(
-	"errors"
 	"golang.org/x/crypto/bcrypt"
-
-	"task_manager/domain"
 )
 
 // function to hash pwd

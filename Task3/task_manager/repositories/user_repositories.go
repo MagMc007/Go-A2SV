@@ -2,11 +2,9 @@ package repositories
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"task_manager/domain"
@@ -33,7 +31,7 @@ func (u *UserRepository) GetByUsername(username string) (domain.User, error) {
 	var user domain.User
 	err := u.collection.FindOne(
 		ctx, 
-		bson.M{"username": username}
+		bson.M{"username": username},
 	).Decode(&user)
 
 	if err != nil {

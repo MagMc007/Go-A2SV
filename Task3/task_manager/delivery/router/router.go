@@ -1,9 +1,8 @@
 package router
 
-import (
-	"task_manager/controllers"
-
-	"task_manager/middleware"
+import(
+	"task_manager/infrastructure"
+	"task_manager/delivery/controllers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,11 +11,11 @@ func SetupRouter(controller *controllers.Controller) *gin.Engine {
 	router := gin.Default()
 
 	protected := router.Group("/tasks")
-	protected.Use(middleware.AuthMiddleware())
+	protected.Use(infrastructure.AuthMiddleware())
 
 	protected.GET(
 		"",
-		middleware.AdminOnly(),
+		infrastructure.AdminOnly(),
 		controller.GetAllTasks,
 	)
 

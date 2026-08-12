@@ -2,16 +2,21 @@ package main
 
 import (
 	"log"
+	"context"
+	"time"
 
-	"task_manager/controllers"
+
+	"task_manager/delivery/controllers"
+	"task_manager/usecases"
+	"task_manager/repositories"
 	"task_manager/data"
-	"task_manager/router"
+	"task_manager/delivery/router"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load()
+	err := godotenv.Load("../.env")
 
 	if err != nil {
 		log.Fatal("Error loading .env")
@@ -35,9 +40,14 @@ func main() {
 	taskCollection := database.Collection("tasks")
 	userCollection := database.Collection("users")
 
-	taskService := data.NewTaskService(taskCollection)
-	userService := data.NewUserService(userCollection)
+	// build repositories (talk to Mongo)
+	taskRepo := repositories.NewTaskRepository(taskCollection)
+	userRepo := repositories.NewUserRepository(userCollection)
 
+	// build usecases (wrap repositories)
+	taskService := usecases.NewTaskUsecase(taskRepo)
+	userService := usecases.NewUserUsecase(userRepo)   
+	
 	controller := controllers.NewController(
 		taskService,
 		userService,
