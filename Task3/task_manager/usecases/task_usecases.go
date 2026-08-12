@@ -22,7 +22,6 @@ func (tu *TaskUsecase) AddTask(task domain.Task) (domain.Task, error) {
 	return tu.taskRepository.AddTask(task)
 }
 
-
 func (tu *TaskUsecase) GetAllTasks() ([]domain.Task, error) {
 	return tu.taskRepository.GetAllTasks()
 }
