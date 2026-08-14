@@ -110,7 +110,7 @@ func (suite *TaskUsecaseTestSuite) TestGetTaskDetailsError() {
 
 	assert.Error(suite.T(), err)
 	assert.Equal(suite.T(), repositoryErr, err)
-	assert.Equal(suite.T(), domain.Task{}, result.ID)
+	assert.Equal(suite.T(), domain.Task{}, result)
 }
 
 func (suite *TaskUsecaseTestSuite) TestUpdateTaskSuccess() {
@@ -188,7 +188,7 @@ func (suite *TaskUsecaseTestSuite) TestDeleteTaskError() {
 		DeleteTask(taskID).
 		Return(repositoryErr)
 	
-		err := suite.taskUsecase.DeletedTask(taskID)
+		err := suite.taskUsecase.DeleteTask(taskID)
 
 	assert.Error(suite.T(), err)
 	assert.Equal(suite.T(), err, repositoryErr)
