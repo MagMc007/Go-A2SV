@@ -2,10 +2,10 @@
 // github.com/vektra/mockery
 // template: testify
 
-package domain
+package mocks
 
 import (
-	"task_manager/Domain"
+	"task_manager/domain"
 
 	mock "github.com/stretchr/testify/mock"
 )

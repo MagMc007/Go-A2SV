@@ -22,7 +22,7 @@ require-template-schema-exists: true
 template: testify
 template-schema: "{{.Template}}.schema.json"
 packages:
-  task_manager/Domain:
+  task_manager/domain:
     config:
       all: true
       dir: mocks
